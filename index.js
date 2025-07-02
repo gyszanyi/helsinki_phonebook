@@ -6,6 +6,7 @@ const cors = require('cors')
 app.use(cors())
 
 app.use(express.json())
+app.use(express.static('dist'))
 app.use(morgan('tiny', {
   skip: function (req, res) { return req.method === 'POST' }
 }))
