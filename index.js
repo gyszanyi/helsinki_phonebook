@@ -4,8 +4,9 @@ var morgan = require('morgan')
 const app = express()
 const Person = require('./models/person')
 
-app.use(express.json())
 app.use(express.static('dist'))
+app.use(express.json())
+
 app.use(morgan('tiny', {
   skip: function (req, res) { return req.method === 'POST' }
 }))
@@ -51,10 +52,16 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.get('/api/persons/:id', (request, response) => {
-  Person.findById(request.params.id).then(person => {
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
+  .then(person => {
+    if (person) {
     response.json(person)
+    } else {
+      response.status(404).end()
+    }
   })
+  .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
@@ -75,8 +82,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
   .catch(error => next(error))
 })
 
-//const randomId = () => Math.floor(Math.random() * 100000).toString()
-
 app.post('/api/persons/', (request, response) => {
   const body = request.body
 
@@ -85,12 +90,7 @@ app.post('/api/persons/', (request, response) => {
       error: 'Missing information: please give both name and phone number!'
     })
   } 
-  /*else if (persons.find(person => person.name === body.name)) {
-    return response.status(400).json({
-      error: `${body.name} is already in the phonebook`
-    })
-  }*/
-
+ 
   const person = new Person({
     name: body.name,
     number: body.number,
@@ -100,6 +100,25 @@ app.post('/api/persons/', (request, response) => {
     response.json(savedPerson)
   })
 })
+
+
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
