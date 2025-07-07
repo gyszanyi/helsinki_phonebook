@@ -1,14 +1,14 @@
+require('dotenv').config()
 const express = require('express')
-const app = express()
 var morgan = require('morgan')
+const app = express()
+const Person = require('./models/person')
 
 app.use(express.json())
 app.use(express.static('dist'))
 app.use(morgan('tiny', {
   skip: function (req, res) { return req.method === 'POST' }
 }))
-
-
 
 morgan.token('data', function (req, res) {
   return JSON.stringify(req.body)
@@ -17,7 +17,6 @@ morgan.token('data', function (req, res) {
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data', {
   skip: function (req, res) { return req.method !== 'POST' }
 }))
-
 
 let persons = [
   {
@@ -47,7 +46,9 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -99,8 +100,6 @@ app.post('/api/persons/', (request, response) => {
   persons = persons.concat(person)
   response.json(person)
 })
-
-
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
