@@ -1,4 +1,4 @@
-POST https://helsinki-phonebook-pjuz.onrender.com/api/persons/ HTTP/1.1
+POST http://localhost:3001/api/persons/
 Content-Type: application/json
 
 {

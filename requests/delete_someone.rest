@@ -1,1 +1,1 @@
-DELETE https://helsinki-phonebook-pjuz.onrender.com/api/persons/api/persons/22772
+DELETE https://helsinki-phonebook-pjuz.onrender.com/api/persons/api/persons/71605
