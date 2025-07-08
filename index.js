@@ -73,7 +73,7 @@ app.get('/info', (request, response, next) => {
      <p>${time}</p>`
     )
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 
@@ -88,11 +88,11 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons/', (request, response, next) => {
   const body = request.body
 
-/*   if (!body.name || !body.number) {
-    return response.status(400).json({
-      error: 'Missing information: please give both name and phone number!'
-    })
-  } */
+  /*   if (!body.name || !body.number) {
+      return response.status(400).json({
+        error: 'Missing information: please give both name and phone number!'
+      })
+    } */
 
   const person = new Person({
     name: body.name,
@@ -102,13 +102,13 @@ app.post('/api/persons/', (request, response, next) => {
   person.save()
     .then(savedPerson => {
       response.json(savedPerson)
-  })
-  .catch(error => next(error))
+    })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body
-  console.log('request: ', request.body, 'id: ', request.params.id)
+  //console.log('request: ', request.body, 'id: ', request.params.id)
 
   /*Person.findById(request.params.id)
     .then((person) => {
@@ -124,10 +124,10 @@ app.put('/api/persons/:id', (request, response, next) => {
     })
     .catch(error => next(error))*/
 
-    Person.findByIdAndUpdate(request.params.id, {number: number}, { runValidators: true })
+  Person.findByIdAndUpdate(request.params.id, { number: number }, { runValidators: true })
     .then((originalPerson) => {
-        Person.findById(originalPerson._id).then((person)=>response.json(person))
-      })
+      Person.findById(originalPerson._id).then((person) => response.json(person))
+    })
     .catch(error => next(error))
 })
 
@@ -141,7 +141,7 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
+  //console.error('Hiba: ',error.errors)
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
