@@ -8,18 +8,18 @@ app.use(express.static('dist'))
 app.use(express.json())
 
 app.use(morgan('tiny', {
-  skip: function (req, res) { return req.method === 'POST' }
+  skip: function (req) { return req.method === 'POST' }
 }))
 
-morgan.token('data', function (req, res) {
+morgan.token('data', function (req) {
   return JSON.stringify(req.body)
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data', {
-  skip: function (req, res) { return req.method !== 'POST' }
+  skip: function (req) { return req.method !== 'POST' }
 }))
 
-let persons = [
+/*  let persons = [
   {
     "id": "1",
     "name": "Arto Hellas",
@@ -40,7 +40,7 @@ let persons = [
     "name": "Mary Poppendieck",
     "number": "39-23-6423122"
   }
-]
+]*/
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
@@ -79,7 +79,7 @@ app.get('/info', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -107,7 +107,7 @@ app.post('/api/persons/', (request, response, next) => {
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
-  const { name, number } = request.body
+  const { number } = request.body
   //console.log('request: ', request.body, 'id: ', request.params.id)
 
   /*Person.findById(request.params.id)
